@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naija Pension Calculator</title>
+<style>
+body{font-family:system-ui;padding:20px;max-width:480px;margin:auto;background:#f6f7fb}
+.card{background:white;padding:20px;border-radius:16px;box-shadow:0 4px 12px #0001;margin-top:12px}
+input{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;font-size:16px}
+.btn{width:100%;padding:14px;background:#0a7a3c;color:white;border:none;border-radius:12px;font-size:16px;margin-top:10px}
+.big{font-size:28px;font-weight:800;color:#0a7a3c}
+small{color:#666}
+</style>
+</head>
+<body>
+<h2>🇳🇬 Pension Calculator</h2>
+<small>For Lagos workers - PenCom 8% + 10% rule</small>
+
+<div class="card">
+<label>Monthly Basic + Housing + Transport (₦)</label>
+<input id="salary" type="number" placeholder="e.g 150000" value="150000">
+<label>Current RSA Balance (₦) - optional</label>
+<input id="balance" type="number" placeholder="e.g 4309105" value="4309105">
+<label>Years to Retirement</label>
+<input id="years" type="number" value="19">
+<button class="btn" onclick="calc()">Calculate My Future</button>
+</div>
+
+<div class="card" id="result" style="display:none"></div>
+
+<script>
+function calc(){
+ let sal = +document.getElementById('salary').value;
+ let bal = +document.getElementById('balance').value || 0;
+ let yrs = +document.getElementById('years').value;
+ let emp = sal*0.08, emr = sal*0.10, tot = sal*0.18;
+ let r = 0.125, n = yrs*12, rm = r/12;
+ let fv_bal = bal * Math.pow(1+r, yrs);
+ let fv_contrib = tot * ((Math.pow(1+rm, n)-1)/rm);
+ let total = fv_bal + fv_contrib;
+ let lump = total*0.25;
+ 
+ document.getElementById('result').style.display='block';
+ document.getElementById('result').innerHTML = `
+  <div>Monthly Contrib: <b>₦${tot.toLocaleString()}</b><br>
+  <small>You: ₦${emp.toLocaleString()} | Employer: ₦${emr.toLocaleString()}</small></div>
+  <hr>
+  <div class="big">₦${Math.round(total).toLocaleString()}</div>
+  <div>at 60 in ${yrs} years @12.5%</div>
+  <br>
+  <div>Lump sum (25%): <b>₦${Math.round(lump).toLocaleString()}</b><br>
+  Monthly pension est: <b>₦${Math.round((total-lump)/240).toLocaleString()}/mo</b> for 20yrs</div>
+  <br><button class="btn" onclick="share()">Share on WhatsApp</button>
+ `;
+}
+function share(){
+ let txt = document.getElementById('result').innerText + "\n\nCheck yours: your-link.vercel.app";
+ window.open("https://wa.me/?text="+encodeURIComponent(txt));
+}
+calc();
+</script>
+</body>
+</html>
